@@ -8,7 +8,11 @@
     "nifpga_opensourcerio.h": "c",
     "pwm.h": "c",
     "unistd.h": "c",
-    "time.h": "c"
+    "time.h": "c",
+    "can.h": "c",
+    "niembcan.h": "c",
+    "memalloc.h": "c",
+    "*.inc": "cpp"
   },
   "java.configuration.updateBuildConfiguration": "disabled"
 }

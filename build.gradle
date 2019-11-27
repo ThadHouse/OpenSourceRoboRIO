@@ -69,11 +69,12 @@ model {
       sources {
         fpga(CSourceSet) {
           source {
-            srcDirs 'FPGA/FPGA Bitfiles'
+            srcDirs 'src/main/native/fpga'
             include '**/*.c'
           }
           exportedHeaders {
-            srcDirs 'FPGA/FPGA Bitfiles'
+            srcDirs 'src/main/native/fpga'
+            srcDir 'FPGA/FPGA Bitfiles'
           }
         }
         c {
@@ -82,8 +83,20 @@ model {
             include '**/*.c'
           }
           exportedHeaders {
-            srcDirs 'FPGA/FPGA Bitfiles'
+            srcDirs 'src/main/native/fpga'
             srcDir 'src/main/native/include'
+            srcDir 'FPGA/FPGA Bitfiles'
+          }
+        }
+        cppShared(CppSourceSet) {
+          source {
+            srcDirs 'src/main/native/cppshared'
+            include '**/*.cpp'
+          }
+          exportedHeaders {
+            srcDirs 'src/main/native/fpga'
+            srcDir 'src/main/native/include'
+            srcDir 'FPGA/FPGA Bitfiles'
           }
         }
         cpp {
@@ -92,8 +105,9 @@ model {
             include '**/*.cpp'
           }
           exportedHeaders {
-            srcDirs 'FPGA/FPGA Bitfiles'
+            srcDirs 'src/main/native/fpga'
             srcDir 'src/main/native/include'
+            srcDir 'FPGA/FPGA Bitfiles'
           }
         }
       }
@@ -101,6 +115,7 @@ model {
     }
 
     testExe(NativeExecutableSpec) {
+      nativeUtils.excludeBinariesFromStrip(it)
       sources {
         c {
           source {
