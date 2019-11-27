@@ -1,0 +1,125 @@
+
+import jaci.gradle.toolchains.*
+import jaci.gradle.nativedeps.*
+
+plugins {
+  id 'cpp'
+  id 'c'
+  id 'edu.wpi.first.wpilib.repositories.WPILibRepositoriesPlugin' version '2020.2'
+  id 'edu.wpi.first.NativeUtils' version '2020.6.1'
+  id 'edu.wpi.first.GradleJni' version '0.10.1'
+  id 'edu.wpi.first.GradleVsCode' version '0.10.0'
+}
+
+apply plugin: 'jaci.gradle.EmbeddedTools'
+
+if (project.hasProperty('releaseMode')) {
+  wpilibRepositories.addAllReleaseRepositories(project)
+} else {
+  wpilibRepositories.addAllDevelopmentRepositories(project)
+}
+
+apply from: 'config.gradle'
+
+deploy {
+    targets {
+        target('roborio') {
+            directory = '/home/admin'
+            maxChannels = 4
+            locations {
+                ssh {
+                    address = "172.22.11.2"
+                    user = 'admin'
+                    password = 'admin'
+                    ipv6 = false
+                }
+            }
+        }
+    }
+    artifacts {
+        all {
+            targets << 'roborio'
+            postdeploy << { ctx ->
+                ctx.execute("sync")
+                ctx.execute("ldconfig")
+            }
+        }
+
+        fileArtifact('myFileArtifact') {
+            file = file('FPGA/FPGA Bitfiles/NiFpga_OpenSourceRIO.lvbitx')               // Set the file to deploy. Required.
+            filename = 'NiFpga_OpenSourceRIO.lvbitx'             // Set the filename to deploy to. Default: same name as file
+        }
+
+        nativeArtifact('testStatic') {
+            component = 'testExe'
+            targetPlatform = nativeUtils.wpi.platforms.roborio
+            buildType = 'debug'
+
+            postdeploy << { ctx ->
+                ctx.execute('chmod +x testExe')
+            }
+        }
+    }
+}
+
+
+model {
+  components {
+    wpiHal(NativeLibrarySpec) {
+      sources {
+        fpga(CSourceSet) {
+          source {
+            srcDirs 'FPGA/FPGA Bitfiles'
+            include '**/*.c'
+          }
+          exportedHeaders {
+            srcDirs 'FPGA/FPGA Bitfiles'
+          }
+        }
+        c {
+          source {
+            srcDirs 'src/main/native/c'
+            include '**/*.c'
+          }
+          exportedHeaders {
+            srcDirs 'FPGA/FPGA Bitfiles'
+            srcDir 'src/main/native/include'
+          }
+        }
+        cpp {
+          source {
+            srcDirs 'src/main/native/cpp'
+            include '**/*.cpp'
+          }
+          exportedHeaders {
+            srcDirs 'FPGA/FPGA Bitfiles'
+            srcDir 'src/main/native/include'
+          }
+        }
+      }
+      nativeUtils.useRequiredLibrary(it, 'hal_headers', 'wpiutil_shared')
+    }
+
+    testExe(NativeExecutableSpec) {
+      sources {
+        c {
+          source {
+            srcDirs 'src/main/exe/c'
+            include '**/*.c'
+          }
+        }
+      }
+
+      binaries.all {
+        lib library: 'wpiHal', linkage: 'static'
+        nativeUtils.useRequiredLibrary(it, 'hal_headers', 'wpiutil_static')
+      }
+    }
+
+  }
+}
+
+
+wrapper {
+  gradleVersion = '6.0.1'
+}

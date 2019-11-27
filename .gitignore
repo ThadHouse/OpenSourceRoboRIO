@@ -1,1 +1,6 @@
 FPGA Bitfiles/
+build/
+.gradle/
+.project
+.classpath
+.settings

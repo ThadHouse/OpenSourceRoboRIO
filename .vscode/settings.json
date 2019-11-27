@@ -1,0 +1,14 @@
+{
+  "C_Cpp.default.configurationProvider": "vscode-wpilib",
+  "files.associations": {
+    "halbase.h": "c",
+    "dio.h": "c",
+    "handlesinternal.h": "c",
+    "chandlesinternal.h": "c",
+    "nifpga_opensourcerio.h": "c",
+    "pwm.h": "c",
+    "unistd.h": "c",
+    "time.h": "c"
+  },
+  "java.configuration.updateBuildConfiguration": "disabled"
+}
