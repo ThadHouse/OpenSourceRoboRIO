@@ -70,6 +70,7 @@ model {
         fpga(CSourceSet) {
           source {
             srcDirs 'src/main/native/fpga'
+            srcDir 'FPGA/FPGA Bitfiles'
             include '**/*.c'
           }
           exportedHeaders {
