@@ -128,7 +128,7 @@ model {
 
       binaries.all {
         lib library: 'wpiHal', linkage: 'static'
-        nativeUtils.useRequiredLibrary(it, 'hal_headers', 'wpiutil_static')
+        nativeUtils.useRequiredLibrary(it, 'hal_headers', 'ntcore_static', 'wpiutil_static')
       }
     }
 

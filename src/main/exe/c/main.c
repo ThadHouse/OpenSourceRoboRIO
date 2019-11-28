@@ -7,9 +7,17 @@
 #include "stdlib.h"
 #include "pthread.h"
 
+#include "ntcore_c.h"
+
+#include "hal/AnalogInput.h"
+#include "hal/AnalogOutput.h"
+#include "hal/Accelerometer.h"
+
 #include "NiFpga_OpenSourceRIO.h"
 
 #include <unistd.h> // for usleep
+
+#include "string.h"
 
 void usleep(int val);
 
@@ -19,7 +27,7 @@ void* notifierMain(void* param) {
   HAL_UpdateNotifierAlarm(notifier, HAL_GetFPGATime(&status) + 1000 * 500, &status);
   while (1) {
     uint64_t time = HAL_WaitForNotifierAlarm(notifier, &status);
-    printf("Notifier!\n");
+    //printf("Notifier!\n");
     HAL_UpdateNotifierAlarm(notifier, time + 1000 * 500, &status);
   }
   return NULL;
@@ -45,12 +53,45 @@ int main() {
     return 1;
   }
 
+  HAL_AnalogInputHandle ai = HAL_InitializeAnalogInputPort(HAL_GetPort(0), &status);
 
+  HAL_AnalogOutputHandle ao = HAL_InitializeAnalogOutputPort(HAL_GetPort(0), &status);
+
+  printf("LSB %d\n", HAL_GetAnalogLSBWeight(ai, &status));
+  printf("Offset %d\n", HAL_GetAnalogOffset(ai, &status));
+
+  NT_Inst inst = NT_GetDefaultInstance();
+
+  NT_StartServer(inst, "PersistFile.ini", "", 1735);
+
+  NT_Entry inEntry = NT_GetEntry(inst, "VoltageIn", strlen("VoltageIn"));
+
+  NT_SetEntryDouble(inEntry, 0, 0, 1);
+
+  NT_Entry outEntry = NT_GetEntry(inst, "VoltageOut", strlen("VoltageOut"));
+
+  NT_Entry outEntry2 = NT_GetEntry(inst, "VoltageOut2", strlen("VoltageOut2"));
+
+  NT_Entry outEntry3 = NT_GetEntry(inst, "VoltageOut3", strlen("VoltageOut3"));
+
+  uint64_t ts = 0;
 
   for(;;) {
     usleep(20 * 1000);
+
     status = 0;
     HAL_Bool button = HAL_GetFPGAButton(&status);
+
+    double val = 0;
+    NT_GetEntryDouble(inEntry, &ts, &val);
+    HAL_SetAnalogOutput(ao, val, &status);
+
+    NT_SetEntryDouble(outEntry, 0, HAL_GetAnalogVoltage(ai, &status), 1);
+
+    NT_SetEntryDouble(outEntry2, 0, HAL_GetAnalogValue(ai, &status), 1);
+
+    NT_SetEntryDouble(outEntry3, 0, HAL_GetAnalogValue(ai, &status) * 0.001220703125, 1);
+
     //printf("Setting PWM %d\n", button);
     HAL_SetPWMRaw(pwm, button ? 2000 : 1000, &status);
     if (status != 0) {

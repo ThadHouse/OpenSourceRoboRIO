@@ -55,17 +55,17 @@ namespace hal {
 namespace init {
 void InitializeHAL() {
   // InitializeAddressableLED();
-  // InitializeAccelerometer();
+  InitializeAccelerometer();
   // InitializeAnalogAccumulator();
   // InitializeAnalogGyro();
-  // InitializeAnalogInput();
-  // InitializeAnalogInternal();
-  // InitializeAnalogOutput();
+  InitializeAnalogInput();
+  InitializeAnalogInternal();
+  InitializeAnalogOutput();
   // InitializeAnalogTrigger();
   // InitializeCAN();
   // InitializeCANAPI();
   // InitializeCompressor();
-  // InitializeConstants();
+  InitializeConstants();
   // InitializeCounter();
   InitializeDigitalInternal();
   // InitializeDIO();
@@ -75,16 +75,16 @@ void InitializeHAL() {
   // InitializeFPGAEncoder();
   // InitializeFRCDriverStation();
   // InitializeI2C();
-  // InitialzeInterrupts();
+  InitialzeInterrupts();
   InitializeMain();
   InitializeNotifier();
   // InitializePCMInternal();
   // InitializePDP();
-  // InitializePorts();
+  InitializePorts();
   // InitializePower();
   InitializePWM();
   InitializeRelay();
-  // InitializeSerialPort();
+  // InitializeSerialPort(); Leave this commented out until VISA links
   // InitializeSolenoid();
   // InitializeSPI();
   // InitializeThreads();

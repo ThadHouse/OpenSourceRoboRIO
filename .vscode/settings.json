@@ -12,7 +12,9 @@
     "can.h": "c",
     "niembcan.h": "c",
     "memalloc.h": "c",
-    "*.inc": "cpp"
+    "*.inc": "cpp",
+    "mutex": "cpp",
+    "condition_variable": "cpp"
   },
   "java.configuration.updateBuildConfiguration": "disabled"
 }
