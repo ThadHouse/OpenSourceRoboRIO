@@ -3,5 +3,5 @@
 #include "hal/Types.h"
 
 extern "C" {
-void HAL_EnableOutputs(HAL_Bool enableOutputs);
+void HAL_FeedWatchdog(HAL_Bool enableOutputs);
 }

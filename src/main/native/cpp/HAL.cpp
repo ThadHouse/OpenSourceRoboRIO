@@ -307,7 +307,7 @@ HAL_Bool HAL_GetFPGAButton(int32_t* status) {
 
 HAL_Bool HAL_GetSystemActive(int32_t* status) {
   NiFpga_Bool value = 0;
-  *status = NiFpga_ReadBool(FPGASession, NiFpga_OpenSourceRIO_ControlBool_PWM_Enabled, &value);
+  *status = NiFpga_ReadBool(FPGASession, NiFpga_OpenSourceRIO_IndicatorBool_PWM_Enabled, &value);
   return value;
 }
 
@@ -441,8 +441,8 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
   return 0;
 }
 
-void HAL_EnableOutputs(HAL_Bool enableOutputs) {
-  NiFpga_WriteBool(FPGASession, NiFpga_OpenSourceRIO_ControlBool_PWM_Enabled, enableOutputs);
+void HAL_FeedWatchdog(HAL_Bool enableOutputs) {
+  NiFpga_WriteBool(FPGASession, NiFpga_OpenSourceRIO_ControlBool_PWM_FeedWatchdog, enableOutputs);
 }
 
 }  // extern "C"
