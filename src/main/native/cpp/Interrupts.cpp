@@ -64,7 +64,7 @@ HAL_InterruptHandle HAL_InitializeInterrupts(HAL_Bool watcher,
   anInterrupt->risingChannel = NiFpga_OpenSourceRIO_IndicatorU32_Interrupt0_RisingTimestamp;
   anInterrupt->fallingChannel = NiFpga_OpenSourceRIO_IndicatorU32_Interrupt0_FallingTimestamp;
 
-  anInterrupt->irqs = static_cast<NiFpga_Irq>(NiFpga_Irq_0 | NiFpga_Irq_1);
+  anInterrupt->irqs = static_cast<NiFpga_Irq>(NiFpga_Irq_0 | NiFpga_Irq_8);
   return handle;
 }
 

@@ -68,7 +68,7 @@ void InitializeHAL() {
   InitializeConstants();
   // InitializeCounter();
   InitializeDigitalInternal();
-  // InitializeDIO();
+  InitializeDIO();
   // InitializeDMA();
   // InitializeDutyCycle();
   // InitializeEncoder();

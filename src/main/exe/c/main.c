@@ -12,6 +12,7 @@
 #include "hal/AnalogInput.h"
 #include "hal/AnalogOutput.h"
 #include "hal/Accelerometer.h"
+#include "hal/Interrupts.h"
 
 #include "NiFpga_OpenSourceRIO.h"
 
@@ -33,6 +34,37 @@ void* notifierMain(void* param) {
   return NULL;
 }
 
+
+
+void* interruptMain(void* param) {
+  int32_t status = 0;
+  HAL_InterruptHandle interrupt = HAL_InitializeInterrupts(0, &status);
+
+  printf("Create Interrupt %d\n", status);
+
+  HAL_DigitalHandle input = *(HAL_DigitalHandle*)param;
+
+  HAL_SetInterruptUpSourceEdge(interrupt, 0, 1, &status);
+
+  printf("Up Source Edge %d\n", status);
+
+  HAL_RequestInterrupts(interrupt, input, HAL_Trigger_kFallingPulse, &status);
+
+  printf("Request %d\n", status);
+
+  while (1) {
+    int64_t mask = HAL_WaitForInterrupt(interrupt, 1, 0, &status);
+
+    printf("Wait %d\n", status);
+    if (mask == 0) {
+      printf("Timeout!\n");
+    } else {
+      printf("Interrupt! %d\n", (int)mask);
+      printf("Time %d\n", (int)HAL_ReadInterruptFallingTimestamp(interrupt, &status));
+    }
+  }
+}
+
 int main() {
   HAL_Bool didInit = HAL_Initialize(500, 0);
 
@@ -44,6 +76,8 @@ int main() {
   pthread_t thread;
   pthread_create(&thread, NULL, notifierMain, NULL);
 
+
+
   int32_t status = 0;
 
   HAL_DigitalHandle pwm = HAL_InitializePWMPort(HAL_GetPort(0), &status);
@@ -52,6 +86,11 @@ int main() {
     printf("Error: %d\n", status);
     return 1;
   }
+
+  HAL_DigitalHandle input = HAL_InitializeDIOPort(HAL_GetPort(0), 1, &status);
+
+      pthread_t interruptThread;
+  pthread_create(&interruptThread, NULL, interruptMain, &input);
 
   HAL_AnalogInputHandle ai = HAL_InitializeAnalogInputPort(HAL_GetPort(0), &status);
 
@@ -74,6 +113,8 @@ int main() {
 
   NT_Entry outEntry3 = NT_GetEntry(inst, "VoltageOut3", strlen("VoltageOut3"));
 
+  NT_Entry inputEntry = NT_GetEntry(inst, "Input", strlen("Input"));
+
   uint64_t ts = 0;
 
   for(;;) {
@@ -91,6 +132,8 @@ int main() {
     NT_SetEntryDouble(outEntry2, 0, HAL_GetAnalogValue(ai, &status), 1);
 
     NT_SetEntryDouble(outEntry3, 0, HAL_GetAnalogValue(ai, &status) * 0.001220703125, 1);
+
+    NT_SetEntryBoolean(inputEntry, 0, HAL_GetDIO(input, &status), 1);
 
     //printf("Setting PWM %d\n", button);
     HAL_SetPWMRaw(pwm, button ? 2000 : 1000, &status);
