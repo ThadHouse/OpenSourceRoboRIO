@@ -10,10 +10,10 @@
 #include "hal/handles/HandlesInternal.h"
 #include "hal/handles/LimitedHandleResource.h"
 
-#include "NiFpga_OpenSourceRIO.h"
-#include "Globals.h"
 
-using namespace hal::internal;
+#include "FPGA.h"
+
+
 
 using namespace hal;
 

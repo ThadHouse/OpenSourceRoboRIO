@@ -5,9 +5,9 @@
 #include <pthread.h>
 
 #include "cHandlesInternal.h"
-#include "NiFpga_OpenSourceRIO.h"
 
-#include "Globals.h"
+
+#include "FPGA.h"
 
 static HAL_DigitalHandle dioHandles[26] = {0};
 

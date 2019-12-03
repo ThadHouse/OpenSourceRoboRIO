@@ -1734,6 +1734,9 @@ static const uint32_t NiFpga_InfiniteTimeout = 0xFFFFFFFF;
  *  @{
  */
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
+
 /**
  * Enumeration of all 32 possible IRQs. Multiple IRQs can be bitwise ORed
  * together like this:
@@ -1775,6 +1778,8 @@ typedef enum
    NiFpga_Irq_30 = 1 << 30,
    NiFpga_Irq_31 = 1U << 31
 } NiFpga_Irq;
+
+#pragma GCC diagnostic pop
 
 /**
  * See NiFpga_ReserveIrqContext for more information.

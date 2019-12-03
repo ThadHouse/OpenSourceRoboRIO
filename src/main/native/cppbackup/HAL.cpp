@@ -1,7 +1,7 @@
 #include "hal/HALBase.h"
-#include "NiFpga_OpenSourceRIO.h"
 
-#include "Globals.h"
+
+#include "FPGA.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,7 +14,7 @@ namespace internal {
 }
 }
 
-using namespace hal::internal;
+
 
 static void ExitFunc() {
   if (FPGASession) {

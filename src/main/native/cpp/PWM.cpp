@@ -19,10 +19,10 @@
 #include "hal/cpp/fpga_clock.h"
 #include "hal/handles/HandlesInternal.h"
 
-#include "NiFpga_OpenSourceRIO.h"
-#include "Globals.h"
 
-using namespace hal::internal;
+#include "FPGA.h"
+
+
 
 using namespace hal;
 

@@ -20,10 +20,10 @@
 #include "hal/HAL.h"
 #include "hal/Ports.h"
 //#include "hal/cpp/UnsafeDIO.h"
-#include "NiFpga_OpenSourceRIO.h"
-#include "Globals.h"
 
-using namespace hal::internal;
+#include "FPGA.h"
+
+
 
 namespace hal {
 

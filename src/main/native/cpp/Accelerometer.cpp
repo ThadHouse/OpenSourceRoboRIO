@@ -1,9 +1,9 @@
 #include "hal/Accelerometer.h"
 
-#include "NiFpga_OpenSourceRIO.h"
-#include "Globals.h"
 
-using namespace hal::internal;
+#include "FPGA.h"
+
+
 
 using namespace hal;
 

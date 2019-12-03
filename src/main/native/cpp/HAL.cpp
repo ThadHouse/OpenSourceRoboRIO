@@ -26,7 +26,7 @@
 #include <wpi/timestamp.h>
 
 #include "HALInitializer.h"
-#include "Globals.h"
+#include "FPGA.h"
 //#include "ctre/ctre.h"
 //#include "hal/ChipObject.h"
 #include "hal/DriverStation.h"
@@ -35,7 +35,7 @@
 #include "hal/handles/HandlesInternal.h"
 #include "cpp/visa/visa.h"
 
-#include "NiFpga_OpenSourceRIO.h"
+
 
 using namespace hal;
 
@@ -45,7 +45,7 @@ namespace internal {
 }
 }
 
-using namespace hal::internal;
+
 
 //static std::unique_ptr<tGlobal> global;
 //static std::unique_ptr<tSysWatchdog> watchdog;
@@ -395,6 +395,8 @@ HAL_Bool HAL_Initialize(int32_t timeout, int32_t mode) {
       NiFpga_Close(FPGASession, 0);
     });
   } else {
+    wpi::outs() << "Initialize Error: " << (int)status << "\n";
+    wpi::outs().flush();
     return false;
   }
 

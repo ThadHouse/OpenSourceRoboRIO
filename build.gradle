@@ -30,7 +30,7 @@ deploy {
                 ssh {
                     address = "172.22.11.2"
                     user = 'admin'
-                    password = 'admin'
+                    password = ''
                     ipv6 = false
                 }
             }
@@ -46,11 +46,14 @@ deploy {
         }
 
         fileArtifact('myFileArtifact') {
-            file = file('FPGA/FPGA Bitfiles/NiFpga_OpenSourceRIO.lvbitx')               // Set the file to deploy. Required.
+            file = file('FPGA/FPGA Bitfiles/Generated/NiFpga_OpenSourceRIO.lvbitx')               // Set the file to deploy. Required.
             filename = 'NiFpga_OpenSourceRIO.lvbitx'             // Set the filename to deploy to. Default: same name as file
         }
 
         nativeArtifact('testStatic') {
+            predeploy << { ctx ->
+                ctx.execute('/usr/local/frc/bin/frcKillRobot.sh -t')
+            }
             component = 'testExe'
             targetPlatform = nativeUtils.wpi.platforms.roborio
             buildType = 'debug'
@@ -70,12 +73,12 @@ model {
         fpga(CSourceSet) {
           source {
             srcDirs 'src/main/native/fpga'
-            srcDir 'FPGA/FPGA Bitfiles'
+            srcDir 'FPGA/FPGA Bitfiles/Generated'
             include '**/*.c'
           }
           exportedHeaders {
             srcDirs 'src/main/native/fpga'
-            srcDir 'FPGA/FPGA Bitfiles'
+            srcDir 'FPGA/FPGA Bitfiles/Generated'
           }
         }
         c {
@@ -86,7 +89,7 @@ model {
           exportedHeaders {
             srcDirs 'src/main/native/fpga'
             srcDir 'src/main/native/include'
-            srcDir 'FPGA/FPGA Bitfiles'
+            srcDir 'FPGA/FPGA Bitfiles/Generated'
           }
         }
         cppShared(CppSourceSet) {
@@ -97,7 +100,7 @@ model {
           exportedHeaders {
             srcDirs 'src/main/native/fpga'
             srcDir 'src/main/native/include'
-            srcDir 'FPGA/FPGA Bitfiles'
+            srcDir 'FPGA/FPGA Bitfiles/Generated'
           }
         }
         cpp {
@@ -108,7 +111,7 @@ model {
           exportedHeaders {
             srcDirs 'src/main/native/fpga'
             srcDir 'src/main/native/include'
-            srcDir 'FPGA/FPGA Bitfiles'
+            srcDir 'FPGA/FPGA Bitfiles/Generated'
           }
         }
       }
@@ -138,4 +141,74 @@ model {
 
 wrapper {
   gradleVersion = '6.0.1'
+}
+
+def genInterface = tasks.register('runFPGACGenerator', Exec) {
+  workingDir file('FPGA\\FPGA Bitfiles')
+
+  inputs.file file('FPGA\\FPGA Bitfiles\\roboriofpga_OpenSourceRIO_OpenSourceRIO.lvbitx')
+  outputs.dir file('FPGA\\FPGA Bitfiles\\GeneratedRaw')
+
+  commandLine 'C:\\Program Files (x86)\\National Instruments\\FPGA Interface C API\\nicapigencli.exe', 'roboriofpga_OpenSourceRIO_OpenSourceRIO.lvbitx', '-e', '--outputDirectory', file('FPGA\\FPGA Bitfiles\\GeneratedRaw')
+}
+
+def patchFPGA = tasks.register('patchFPGA') {
+  inputs.dir file('FPGA\\FPGA Bitfiles\\GeneratedRaw')
+  outputs.dir file('FPGA\\FPGA Bitfiles\\Generated')
+
+  dependsOn genInterface
+
+  doLast {
+    def headerFileLines = file('FPGA\\FPGA Bitfiles\\GeneratedRaw\\NiFpga_OpenSourceRIO.h').readLines()
+    def srcFileText = file('FPGA\\FPGA Bitfiles\\GeneratedRaw\\NiFpga_OpenSourceRIO.c').text
+
+    def typedefLines = [:]
+
+    // Add static to definitons
+    headerFileLines.eachWithIndex { line, index ->
+      if (line.startsWith('const')) {
+        headerFileLines.set(index, "static ${line}".toString())
+      }
+
+      if (line.startsWith('const NiFpga_FxpTypeInfo ')) {
+        def key = line.split(' ')[2]
+        def lineArr = typedefLines.get(key)
+        if (lineArr != null) {
+          lineArr << index
+        } else {
+          lineArr = [index]
+          typedefLines.put(key, lineArr)
+        }
+      }
+
+    }
+
+    typedefLines.each { key, value ->
+      if (value.size > 1) {
+        // Found any duplicates, remove the next 7 lines
+        def toRemove = (value.size - 1) * 6
+        def start = value.get(1)
+        for (int i = start; i < toRemove + start ; i++) {
+          headerFileLines.remove(start)
+        }
+      }
+    }
+
+
+
+    file('FPGA\\FPGA Bitfiles\\Generated\\NiFpga_OpenSourceRIO.h').text = headerFileLines.join(System.properties.'line.separator')
+    file('FPGA\\FPGA Bitfiles\\Generated\\NiFpga_OpenSourceRIO.c').text = srcFileText
+
+
+
+    copy {
+      from 'FPGA\\FPGA Bitfiles\\GeneratedRaw\\NiFpga_OpenSourceRIO.lvbitx'
+      into "FPGA\\FPGA Bitfiles\\Generated"
+    }
+  }
+}
+
+tasks.register('generateFPGA') {
+  dependsOn genInterface
+  dependsOn patchFPGA
 }

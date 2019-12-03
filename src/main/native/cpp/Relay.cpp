@@ -12,11 +12,11 @@
 #include "PortsInternal.h"
 #include "hal/handles/IndexedHandleResource.h"
 
-#include "NiFpga_OpenSourceRIO.h"
 
-#include "Globals.h"
 
-using namespace hal::internal;
+#include "FPGA.h"
+
+
 
 using namespace hal;
 

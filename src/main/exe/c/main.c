@@ -14,8 +14,6 @@
 #include "hal/Accelerometer.h"
 #include "hal/Interrupts.h"
 
-#include "NiFpga_OpenSourceRIO.h"
-
 #include <unistd.h> // for usleep
 
 #include "string.h"

@@ -1,0 +1,24 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+   {
+      "console": "integratedTerminal",
+      "cwd": "/Users/austinshalit/Desktop/GearsBotJava",
+      "env": {
+        "DYLD_LIBRARY_PATH": "/Users/austinshalit/Desktop/GearsBotJava/build/tmp/jniExtractDir",
+        "HALSIM_EXTENSIONS": "",
+        "LD_LIBRARY_PATH": "/Users/austinshalit/Desktop/GearsBotJava/build/tmp/jniExtractDir",
+        "PATH": "/Users/austinshalit/Desktop/GearsBotJava/build/tmp/jniExtractDir"
+      },
+      "mainClass": "frc.robot.Main",
+      "name": "WPILib Java Simulate",
+      "request": "launch",
+      "stopOnEntry": false,
+      "type": "java",
+      "vmArgs": "-Djava.library.path=\"/Users/austinshalit/Desktop/GearsBotJava/build/tmp/jniExtractDir\""
+    }
+  ]
+}

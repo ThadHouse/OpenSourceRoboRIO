@@ -20,12 +20,12 @@
 #include "hal/HAL.h"
 #include "hal/handles/UnlimitedHandleResource.h"
 
-#include "NiFpga_OpenSourceRIO.h"
-#include "Globals.h"
+
+#include "FPGA.h"
 #include <thread>
 #include <atomic>
 
-using namespace hal::internal;
+
 
 using namespace hal;
 

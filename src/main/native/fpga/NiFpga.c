@@ -2651,7 +2651,10 @@ NiFpga_Status NiFpga_Initialize(void)
             if (symFindStatus!= OK && NiFpga_functions[i].required)
                return NiFpga_Status_VersionMismatch;
          #elif NiFpga_Linux || NiFpga_MacOsX
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpedantic"
             *address = (NiFpga_FunctionPointer)dlsym(NiFpga_library, name);
+#pragma GCC diagnostic pop
             if (!*address && NiFpga_functions[i].required)
                return NiFpga_Status_VersionMismatch;
          #else

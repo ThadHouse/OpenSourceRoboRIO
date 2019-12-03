@@ -15,10 +15,10 @@
 #include "PortsInternal.h"
 #include "hal/AnalogInput.h"
 
-#include "NiFpga_OpenSourceRIO.h"
-#include "Globals.h"
 
-using namespace hal::internal;
+#include "FPGA.h"
+
+
 
 namespace hal {
 
