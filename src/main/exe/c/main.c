@@ -13,6 +13,9 @@
 #include "hal/AnalogOutput.h"
 #include "hal/Accelerometer.h"
 #include "hal/Interrupts.h"
+#include "hal/Enabling.h"
+#include "hal/CAN.h"
+#include "hal/CANAPI.h"
 
 #include <unistd.h> // for usleep
 
@@ -52,14 +55,14 @@ void* interruptMain(void* param) {
 
   while (1) {
     int64_t mask = HAL_WaitForInterrupt(interrupt, 1, 0, &status);
-
-    printf("Wait %d\n", status);
-    if (mask == 0) {
-      printf("Timeout!\n");
-    } else {
-      printf("Interrupt! %d\n", (int)mask);
-      printf("Time %d\n", (int)HAL_ReadInterruptFallingTimestamp(interrupt, &status));
-    }
+    (void)mask;
+    // printf("Wait %d\n", status);
+    // if (mask == 0) {
+    //   printf("Timeout!\n");
+    // } else {
+    //   printf("Interrupt! %d\n", (int)mask);
+    //   printf("Time %d\n", (int)HAL_ReadInterruptFallingTimestamp(interrupt, &status));
+    // }
   }
 }
 
@@ -86,6 +89,8 @@ int main() {
   }
 
   HAL_DigitalHandle input = HAL_InitializeDIOPort(HAL_GetPort(0), 1, &status);
+
+  HAL_DigitalHandle enableInput = HAL_InitializeDIOPort(HAL_GetPort(1), 1, &status);
 
       pthread_t interruptThread;
   pthread_create(&interruptThread, NULL, interruptMain, &input);
@@ -115,11 +120,24 @@ int main() {
 
   uint64_t ts = 0;
 
+  HAL_CANHandle can = HAL_InitializeCAN(HAL_CAN_Man_kREV, 1, HAL_CAN_Dev_kMotorController, &status);
+
   for(;;) {
     usleep(20 * 1000);
 
+    if (!HAL_GetDIO(enableInput, &status)) {
+      HAL_FeedWatchdog();
+    }
+
     status = 0;
     HAL_Bool button = HAL_GetFPGAButton(&status);
+    uint8_t data = 1;
+    HAL_WriteCANPacket(can, &data, 1, 0x060, &status);
+
+    if (status != 0) {
+      printf("Error: %d %s\n", status, HAL_GetErrorMessage(status));
+    }
+    status = 0;
 
     double val = 0;
     NT_GetEntryDouble(inEntry, &ts, &val);

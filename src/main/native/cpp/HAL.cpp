@@ -33,7 +33,7 @@
 #include "hal/Errors.h"
 #include "hal/Notifier.h"
 #include "hal/handles/HandlesInternal.h"
-#include "cpp/visa/visa.h"
+#include "visa/visa.h"
 
 
 
@@ -62,8 +62,8 @@ void InitializeHAL() {
   InitializeAnalogInternal();
   InitializeAnalogOutput();
   // InitializeAnalogTrigger();
-  // InitializeCAN();
-  // InitializeCANAPI();
+  InitializeCAN();
+  InitializeCANAPI();
   // InitializeCompressor();
   InitializeConstants();
   // InitializeCounter();
@@ -84,10 +84,10 @@ void InitializeHAL() {
   // InitializePower();
   InitializePWM();
   InitializeRelay();
-  // InitializeSerialPort(); Leave this commented out until VISA links
+  InitializeSerialPort();
   // InitializeSolenoid();
   // InitializeSPI();
-  // InitializeThreads();
+  InitializeThreads();
 }
 }  // namespace init
 }  // namespace hal
@@ -301,7 +301,7 @@ uint64_t HAL_ExpandFPGATime(uint32_t unexpanded_lower, int32_t* status) {
 
 HAL_Bool HAL_GetFPGAButton(int32_t* status) {
   NiFpga_Bool value = 0;
-  *status = NiFpga_ReadBool(FPGASession, NiFpga_OpenSourceRIO_IndicatorBool_UserButton, &value);
+  *status = NiFpga_ReadBool(FPGASession, NiFpga_OpenSourceRIO_IndicatorBool_User_Button, &value);
   return value;
 }
 
@@ -443,8 +443,13 @@ int64_t HAL_Report(int32_t resource, int32_t instanceNumber, int32_t context,
   return 0;
 }
 
-void HAL_FeedWatchdog(HAL_Bool enableOutputs) {
-  NiFpga_WriteBool(FPGASession, NiFpga_OpenSourceRIO_ControlBool_PWM_FeedWatchdog, enableOutputs);
+void HAL_FeedWatchdog() {
+  NiFpga_WriteBool(FPGASession, NiFpga_OpenSourceRIO_ControlBool_PWM_FeedWatchdog, NiFpga_True);
 }
+
+// No need for header definitions, as we should not run from user code.
+void NumericArrayResize(void) {}
+void RTSetCleanupProc(void) {}
+void EDVR_CreateReference(void) {}
 
 }  // extern "C"

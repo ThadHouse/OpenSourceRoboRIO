@@ -2,6 +2,11 @@
 
 #include "hal/Types.h"
 
+#ifdef __cplusplus
 extern "C" {
-void HAL_FeedWatchdog(HAL_Bool enableOutputs);
+#endif
+void HAL_FeedWatchdog();
+
+#ifdef __cplusplus
 }
+#endif
