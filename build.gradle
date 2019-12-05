@@ -183,13 +183,16 @@ def patchFPGA = tasks.register('patchFPGA') {
 
     }
 
+    def removed = 0
+
     typedefLines.each { key, value ->
       if (value.size > 1) {
         // Found any duplicates, remove the next 7 lines
         def toRemove = (value.size - 1) * 6
-        def start = value.get(1)
+        def start = value.get(1) - removed
         for (int i = start; i < toRemove + start ; i++) {
           headerFileLines.remove(start)
+          removed++
         }
       }
     }
